@@ -1,41 +1,53 @@
-export let cart_Products = [
-    {
-        productId:"e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
-        quantity:2
-    },
-    {
-        productId:"15b6fc6f-327a-4ec4-896f-486349e85a3d",
-        quantity: 3
+function saveCart(cart){
+    console.log("saved: " + JSON.stringify(cart))
+    localStorage.setItem("cart",JSON.stringify(cart));
+}
+
+export const readCartFromStorage = () => {
+    let cart = []
+
+    try{
+        const storedCart = JSON.parse(localStorage.getItem("cart"))
+
+        if(storedCart instanceof Array){
+            cart = storedCart
+        }
+    } catch (e) {
+        console.log(e)
     }
-];
+
+    console.log("read: " + JSON.stringify(cart))
+
+    return cart
+}
 
 export function addToCart(productId){
-    let matchingItem;
-        cart_Products.forEach((cartItem)=>{
-            if(productId===cartItem.productId){
-                matchingItem = cartItem;
-            }
-        });
+    let cart_Products = readCartFromStorage()
 
-        if(matchingItem){
-            matchingItem.quantity++;
+    let matchingItem;
+
+    cart_Products.forEach((cartItem)=>{
+        if(productId===cartItem.productId){
+            matchingItem = cartItem;
         }
-        else{
-            cart_Products.push({
+    });
+
+    if(matchingItem){
+        matchingItem.quantity++;
+    } else {
+        cart_Products.push({
             productId:productId,
             quantity:1,
-            });
-        }
-        //console.log(cart_Products);
+        });
+    }
+
+    saveCart(cart_Products);        //console.log(cart_Products);
 }
 
 export function removeFromCart(productId){
-    const newCart = [];
-    cart_Products.forEach((product)=>{
-        if(productId!==product.productId){
-            newCart.push(product);
-        }
-    });
-    cart_Products = newCart;
-    console.log(cart_Products);
+     const cart_Products = readCartFromStorage()
+
+    const filteredCart = cart_Products.filter((product)=> productId !== product.productId);
+
+    saveCart(filteredCart);
 }
